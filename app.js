@@ -1,5 +1,5 @@
 const express = require('express');
-const geoip = require('geoip-lite');
+const geoip = require('geoip-country');
 const path = require('path');
 
 const app = express();
@@ -22,9 +22,8 @@ app.use((req, res, next) => {
   const clientIP =
     req.headers['x-forwarded-for'] ||
     req.headers['x-real-ip'] ||
-    req.connection.remoteAddress ||
     req.socket.remoteAddress ||
-    (req.connection.socket ? req.connection.socket.remoteAddress : null);
+    req.ip;
 
   // Clean IP address (remove IPv6 prefix if present)
   const cleanIP = clientIP ? clientIP.split(',')[0].trim() : '127.0.0.1';
