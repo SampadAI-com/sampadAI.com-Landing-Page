@@ -9,6 +9,15 @@
 </head>
 <body>
     <div class="container">
+        <!-- Language Switcher -->
+        <% if (language !== 'en') { %>
+        <div class="language-switcher">
+            <button class="lang-button" onclick="switchToEnglish()">
+                🇺🇸 English
+            </button>
+        </div>
+        <% } %>
+        
         <div class="coming-soon-content">
             <h1 class="title"><%= messages[language].title %></h1>
             <p class="tagline"><%= messages[language].tagline %></p>
@@ -37,6 +46,12 @@
     </div>
 
     <script>
+        // Language switching function
+        function switchToEnglish() {
+            window.location.href = '/en';
+        }
+        
+        // Waitlist form handling
         document.querySelector('.waitlist-form').addEventListener('submit', function(e) {
             e.preventDefault();
             

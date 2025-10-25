@@ -27,6 +27,36 @@ body {
   max-width: 600px;
   padding: 40px 20px;
   text-align: center;
+  position: relative;
+}
+
+.language-switcher {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.lang-button {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.lang-button:hover {
+  background: #ffffff;
+  border-color: #000000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .coming-soon-content {
@@ -157,6 +187,16 @@ body {
     padding: 20px 16px;
   }
 
+  .language-switcher {
+    top: 16px;
+    right: 16px;
+  }
+
+  .lang-button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
   .title {
     font-size: 3rem;
   }
@@ -184,6 +224,16 @@ body {
 }
 
 @media (max-width: 480px) {
+  .language-switcher {
+    top: 12px;
+    right: 12px;
+  }
+
+  .lang-button {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
   .title {
     font-size: 2.5rem;
   }
