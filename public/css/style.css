@@ -1,0 +1,204 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    'Space Grotesk',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  background: #ffffff;
+  color: #000000;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 600px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.coming-soon-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #000000;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.tagline {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333333;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+.coming-soon {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #666666;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.description {
+  font-size: 1.125rem;
+  color: #666666;
+  font-weight: 400;
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+.waitlist-form {
+  width: 100%;
+  max-width: 500px;
+  margin-top: 16px;
+}
+
+.form-group {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.email-input {
+  flex: 1;
+  padding: 16px 20px;
+  border: 2px solid #e5e5e5;
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: inherit;
+  background: #ffffff;
+  color: #000000;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.email-input:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.email-input::placeholder {
+  color: #999999;
+}
+
+.join-button {
+  padding: 16px 32px;
+  background: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.join-button:hover {
+  background: #333333;
+  transform: translateY(-1px);
+}
+
+.join-button:active {
+  transform: translateY(0);
+}
+
+.success-message {
+  background: #f0f9ff;
+  color: #0369a1;
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 1px solid #bae6fd;
+  font-weight: 500;
+  margin-top: 16px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 16px;
+  }
+
+  .title {
+    font-size: 3rem;
+  }
+
+  .tagline {
+    font-size: 1.125rem;
+  }
+
+  .coming-soon {
+    font-size: 1.25rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .form-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .join-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .tagline {
+    font-size: 1rem;
+  }
+
+  .coming-soon {
+    font-size: 1.125rem;
+  }
+
+  .email-input,
+  .join-button {
+    padding: 14px 16px;
+    font-size: 16px;
+  }
+}

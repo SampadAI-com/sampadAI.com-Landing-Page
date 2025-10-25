@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="<%= language %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= messages[language].title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="coming-soon-content">
+            <h1 class="title"><%= messages[language].title %></h1>
+            <p class="tagline"><%= messages[language].tagline %></p>
+            <h2 class="coming-soon"><%= messages[language].comingSoon %></h2>
+            <p class="description"><%= messages[language].description %></p>
+            
+            <form class="waitlist-form" action="/waitlist" method="POST">
+                <div class="form-group">
+                    <input 
+                        type="email" 
+                        name="email" 
+                        placeholder="<%= messages[language].emailPlaceholder %>" 
+                        required 
+                        class="email-input"
+                    >
+                    <button type="submit" class="join-button">
+                        <%= messages[language].joinWaitlist %>
+                    </button>
+                </div>
+            </form>
+            
+            <div class="success-message" id="successMessage" style="display: none;">
+                <%= messages[language].successMessage %>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('.waitlist-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = this.querySelector('input[name="email"]').value;
+            const successMessage = document.getElementById('successMessage');
+            
+            // Simulate form submission
+            setTimeout(() => {
+                this.style.display = 'none';
+                successMessage.style.display = 'block';
+            }, 500);
+        });
+    </script>
+</body>
+</html>

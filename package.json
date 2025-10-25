@@ -1,0 +1,28 @@
+{
+  "name": "sampadai-landing-page",
+  "version": "1.0.0",
+  "description": "Multi-language landing page for SampadAI",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "geoip-lite": "^1.4.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2"
+  },
+  "keywords": [
+    "express",
+    "multi-language",
+    "landing-page"
+  ],
+  "author": "SampadAI",
+  "license": "MIT"
+}
