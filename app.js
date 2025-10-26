@@ -1,3 +1,6 @@
+// Load environment variables
+require('dotenv').config();
+
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
@@ -10,7 +13,9 @@ const PORT = process.env.PORT || 3000;
 const GOOGLE_SHEETS_CONFIG = {
   spreadsheetId: process.env.GOOGLE_SHEET_ID,
   range: 'Waitlist!A:C', // A=Email, B=Date, C=Status
-  credentials: process.env.GOOGLE_SERVICE_ACCOUNT_KEY ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY) : null
+  credentials: process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+    ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY)
+    : null,
 };
 
 // Set EJS as the view engine
@@ -26,48 +31,76 @@ app.use(express.urlencoded({ extended: true }));
 
 // Helper function to save email to Google Sheets
 async function saveToGoogleSheets(email) {
-  if (!GOOGLE_SHEETS_CONFIG.spreadsheetId || !GOOGLE_SHEETS_CONFIG.credentials) {
+  console.log('🔍 Attempting to save to Google Sheets:', email);
+
+  if (
+    !GOOGLE_SHEETS_CONFIG.spreadsheetId ||
+    !GOOGLE_SHEETS_CONFIG.credentials
+  ) {
+    console.log('❌ Google Sheets not configured properly');
+    console.log(
+      'Spreadsheet ID:',
+      GOOGLE_SHEETS_CONFIG.spreadsheetId ? '✅' : '❌'
+    );
+    console.log('Credentials:', GOOGLE_SHEETS_CONFIG.credentials ? '✅' : '❌');
     throw new Error('Google Sheets not configured');
   }
 
-  const auth = new google.auth.GoogleAuth({
-    credentials: GOOGLE_SHEETS_CONFIG.credentials,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets']
-  });
+  try {
+    const auth = new google.auth.GoogleAuth({
+      credentials: GOOGLE_SHEETS_CONFIG.credentials,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
 
-  const sheets = google.sheets({ version: 'v4', auth });
-  
-  const values = [
-    [email, new Date().toISOString(), 'Active']
-  ];
+    const sheets = google.sheets({ version: 'v4', auth });
 
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: GOOGLE_SHEETS_CONFIG.spreadsheetId,
-    range: GOOGLE_SHEETS_CONFIG.range,
-    valueInputOption: 'RAW',
-    resource: { values }
-  });
+    const values = [[email, new Date().toISOString(), 'Active']];
+
+    console.log('📝 Appending to sheet:', GOOGLE_SHEETS_CONFIG.spreadsheetId);
+    const result = await sheets.spreadsheets.values.append({
+      spreadsheetId: GOOGLE_SHEETS_CONFIG.spreadsheetId,
+      range: GOOGLE_SHEETS_CONFIG.range,
+      valueInputOption: 'RAW',
+      resource: { values },
+    });
+
+    console.log('✅ Successfully saved to Google Sheets:', result.data);
+    return result;
+  } catch (error) {
+    console.error('❌ Google Sheets error:', error.message);
+    throw error;
+  }
 }
 
 // Helper function to get country from IP using free API
 async function getCountryFromIP(ip) {
   try {
     // Skip geolocation for localhost/private IPs
-    if (ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+    if (
+      ip === '127.0.0.1' ||
+      ip === '::1' ||
+      ip.startsWith('192.168.') ||
+      ip.startsWith('10.')
+    ) {
       return null;
     }
 
     // Use ipapi.co - free, reliable, serverless-friendly
     const response = await axios.get(`https://ipapi.co/${ip}/country/`, {
-      timeout: 2000, // 2 second timeout
+      timeout: 3000, // 3 second timeout
       headers: {
-        'User-Agent': 'SampadAI-Landing-Page/1.0'
-      }
+        'User-Agent': 'SampadAI-Landing-Page/1.0',
+      },
     });
-    
+
     return response.data?.trim() || null;
   } catch (error) {
-    console.warn('Geolocation API failed:', error.message);
+    // Don't log rate limit errors as warnings - they're expected
+    if (error.response?.status === 429) {
+      console.log('Geolocation API rate limited, using default language');
+    } else {
+      console.warn('Geolocation API failed:', error.message);
+    }
     return null;
   }
 }
@@ -184,7 +217,9 @@ app.post('/waitlist', async (req, res) => {
       await saveToGoogleSheets(email);
       console.log(`✅ Waitlist signup saved to Google Sheets: ${email}`);
     } catch (sheetsError) {
-      console.log(`📝 Waitlist signup (Google Sheets not configured): ${email}`);
+      console.log(
+        `📝 Waitlist signup (Google Sheets not configured): ${email}`
+      );
       console.log('Google Sheets setup required. See README for instructions.');
     }
 
@@ -194,10 +229,10 @@ app.post('/waitlist', async (req, res) => {
     });
   } catch (error) {
     console.error('Waitlist error:', error);
-    
+
     // Fallback to console log
     console.log(`📝 Waitlist signup (error occurred): ${email}`);
-    
+
     res.json({
       success: true,
       message: 'Successfully added to waitlist!',
