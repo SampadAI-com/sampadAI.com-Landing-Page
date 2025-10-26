@@ -1,5 +1,5 @@
 const express = require('express');
-const geoip = require('geoip-country');
+const axios = require('axios');
 const path = require('path');
 
 const app = express();
@@ -16,40 +16,70 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Language detection middleware
-app.use((req, res, next) => {
-  // Get client IP (considering proxy headers)
-  const clientIP =
-    req.headers['x-forwarded-for'] ||
-    req.headers['x-real-ip'] ||
-    req.socket.remoteAddress ||
-    req.ip;
-
-  // Clean IP address (remove IPv6 prefix if present)
-  const cleanIP = clientIP ? clientIP.split(',')[0].trim() : '127.0.0.1';
-
-  // Get geolocation data
-  const geo = geoip.lookup(cleanIP);
-
-  // Determine language based on country
-  let language = 'en'; // Default to English
-
-  if (geo && geo.country) {
-    switch (geo.country) {
-      case 'DE':
-        language = 'de';
-        break;
-      case 'PL':
-        language = 'pl';
-        break;
-      default:
-        language = 'en';
+// Helper function to get country from IP using free API
+async function getCountryFromIP(ip) {
+  try {
+    // Skip geolocation for localhost/private IPs
+    if (ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+      return null;
     }
-  }
 
-  // Store language in request object
-  req.language = language;
-  next();
+    // Use ipapi.co - free, reliable, serverless-friendly
+    const response = await axios.get(`https://ipapi.co/${ip}/country/`, {
+      timeout: 2000, // 2 second timeout
+      headers: {
+        'User-Agent': 'SampadAI-Landing-Page/1.0'
+      }
+    });
+    
+    return response.data?.trim() || null;
+  } catch (error) {
+    console.warn('Geolocation API failed:', error.message);
+    return null;
+  }
+}
+
+// Language detection middleware
+app.use(async (req, res, next) => {
+  try {
+    // Get client IP (considering proxy headers)
+    const clientIP =
+      req.headers['x-forwarded-for'] ||
+      req.headers['x-real-ip'] ||
+      req.socket.remoteAddress ||
+      req.ip;
+
+    // Clean IP address (remove IPv6 prefix if present)
+    const cleanIP = clientIP ? clientIP.split(',')[0].trim() : '127.0.0.1';
+
+    // Get country code from IP
+    const country = await getCountryFromIP(cleanIP);
+
+    // Determine language based on country
+    let language = 'en'; // Default to English
+
+    if (country) {
+      switch (country) {
+        case 'DE':
+          language = 'de';
+          break;
+        case 'PL':
+          language = 'pl';
+          break;
+        default:
+          language = 'en';
+      }
+    }
+
+    // Store language in request object
+    req.language = language;
+    next();
+  } catch (error) {
+    console.error('Language detection middleware error:', error);
+    // Fallback to English if anything fails
+    req.language = 'en';
+    next();
+  }
 });
 
 // Helper function to get messages
@@ -138,7 +168,13 @@ app.post('/waitlist', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Visit http://localhost:${PORT} to see the website`);
-});
+// Export the app for Vercel
+module.exports = app;
+
+// Only start the server if not in Vercel environment
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    console.log(`Visit http://localhost:${PORT} to see the website`);
+  });
+}
