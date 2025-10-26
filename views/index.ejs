@@ -9,12 +9,23 @@
 </head>
 <body>
     <div class="container">
-        <!-- Language Switcher -->
+        <!-- Language Switcher Dropdown -->
         <% if (language !== 'en') { %>
         <div class="language-switcher">
-            <button class="lang-button" onclick="switchToEnglish()">
-                EN
-            </button>
+            <div class="dropdown">
+                <button class="dropdown-toggle" onclick="toggleDropdown()">
+                    <%= language.toUpperCase() %>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="dropdown-menu" id="languageDropdown">
+                    <a href="/<%= language %>" class="dropdown-item current">
+                        <%= language.toUpperCase() %>
+                    </a>
+                    <a href="/en" class="dropdown-item">
+                        EN
+                    </a>
+                </div>
+            </div>
         </div>
         <% } %>
         
@@ -46,9 +57,23 @@
     </div>
 
     <script>
-        // Language switching function
-        function switchToEnglish() {
-            window.location.href = '/en';
+        // Dropdown functionality
+        function toggleDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-toggle')) {
+                const dropdowns = document.getElementsByClassName('dropdown-menu');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
         }
         
         // Waitlist form handling

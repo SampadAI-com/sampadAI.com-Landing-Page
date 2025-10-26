@@ -119,35 +119,19 @@ const getMessages = () => ({
   },
 });
 
+// Helper function to render page
+const renderPage = (req, res, language) => {
+  res.render('index', {
+    language,
+    messages: getMessages(),
+  });
+};
+
 // Routes
-app.get('/', (req, res) => {
-  res.render('index', {
-    language: req.language,
-    messages: getMessages(),
-  });
-});
-
-// Language-specific routes (optional)
-app.get('/en', (req, res) => {
-  res.render('index', {
-    language: 'en',
-    messages: getMessages(),
-  });
-});
-
-app.get('/de', (req, res) => {
-  res.render('index', {
-    language: 'de',
-    messages: getMessages(),
-  });
-});
-
-app.get('/pl', (req, res) => {
-  res.render('index', {
-    language: 'pl',
-    messages: getMessages(),
-  });
-});
+app.get('/', (req, res) => renderPage(req, res, req.language));
+app.get('/en', (req, res) => renderPage(req, res, 'en'));
+app.get('/de', (req, res) => renderPage(req, res, 'de'));
+app.get('/pl', (req, res) => renderPage(req, res, 'pl'));
 
 // Waitlist route
 app.post('/waitlist', (req, res) => {

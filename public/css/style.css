@@ -37,7 +37,14 @@ body {
   z-index: 1000;
 }
 
-.lang-button {
+
+/* Dropdown styles */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #e5e5e5;
   border-radius: 8px;
@@ -50,13 +57,61 @@ body {
   font-family: inherit;
   backdrop-filter: blur(10px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.lang-button:hover {
+.dropdown-toggle:hover {
   background: #ffffff;
   border-color: #000000;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  z-index: 1001;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 10px 16px;
+  color: #333333;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  border-radius: 6px;
+  margin: 2px;
+}
+
+.dropdown-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-item.current {
+  background: rgba(0, 0, 0, 0.1);
+  font-weight: 600;
 }
 
 .coming-soon-content {
@@ -192,10 +247,6 @@ body {
     right: 16px;
   }
 
-  .lang-button {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
 
   .title {
     font-size: 3rem;
@@ -229,10 +280,6 @@ body {
     right: 12px;
   }
 
-  .lang-button {
-    padding: 5px 10px;
-    font-size: 12px;
-  }
 
   .title {
     font-size: 2.5rem;
