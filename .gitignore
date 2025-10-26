@@ -64,6 +64,12 @@ jspm_packages/
 # DynamoDB Local files
 .dynamodb/
 
+# Configuration files with sensitive data
+GOOGLE_SHEETS_SETUP.md
+*.json
+!package.json
+!package-lock.json
+
 # OS generated files
 .DS_Store
 .DS_Store?

@@ -77,17 +77,43 @@
         }
         
         // Waitlist form handling
-        document.querySelector('.waitlist-form').addEventListener('submit', function(e) {
+        document.querySelector('.waitlist-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const email = this.querySelector('input[name="email"]').value;
             const successMessage = document.getElementById('successMessage');
+            const submitButton = this.querySelector('button[type="submit"]');
             
-            // Simulate form submission
-            setTimeout(() => {
-                this.style.display = 'none';
-                successMessage.style.display = 'block';
-            }, 500);
+            // Show loading state
+            submitButton.textContent = 'Joining...';
+            submitButton.disabled = true;
+            
+            try {
+                // Submit to backend
+                const response = await fetch('/waitlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Show success message
+                    this.style.display = 'none';
+                    successMessage.style.display = 'block';
+                } else {
+                    throw new Error(result.message || 'Failed to join waitlist');
+                }
+            } catch (error) {
+                console.error('Waitlist error:', error);
+                // Reset button state
+                submitButton.textContent = '<%= messages[language].joinWaitlist %>';
+                submitButton.disabled = false;
+                alert('Failed to join waitlist. Please try again.');
+            }
         });
     </script>
 </body>

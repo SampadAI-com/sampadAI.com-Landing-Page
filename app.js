@@ -1,9 +1,17 @@
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
+const { google } = require('googleapis');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Google Sheets configuration
+const GOOGLE_SHEETS_CONFIG = {
+  spreadsheetId: process.env.GOOGLE_SHEET_ID,
+  range: 'Waitlist!A:C', // A=Email, B=Date, C=Status
+  credentials: process.env.GOOGLE_SERVICE_ACCOUNT_KEY ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY) : null
+};
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
@@ -15,6 +23,31 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Parse JSON and URL-encoded bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Helper function to save email to Google Sheets
+async function saveToGoogleSheets(email) {
+  if (!GOOGLE_SHEETS_CONFIG.spreadsheetId || !GOOGLE_SHEETS_CONFIG.credentials) {
+    throw new Error('Google Sheets not configured');
+  }
+
+  const auth = new google.auth.GoogleAuth({
+    credentials: GOOGLE_SHEETS_CONFIG.credentials,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets']
+  });
+
+  const sheets = google.sheets({ version: 'v4', auth });
+  
+  const values = [
+    [email, new Date().toISOString(), 'Active']
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: GOOGLE_SHEETS_CONFIG.spreadsheetId,
+    range: GOOGLE_SHEETS_CONFIG.range,
+    valueInputOption: 'RAW',
+    resource: { values }
+  });
+}
 
 // Helper function to get country from IP using free API
 async function getCountryFromIP(ip) {
@@ -134,22 +167,42 @@ app.get('/de', (req, res) => renderPage(req, res, 'de'));
 app.get('/pl', (req, res) => renderPage(req, res, 'pl'));
 
 // Waitlist route
-app.post('/waitlist', (req, res) => {
+app.post('/waitlist', async (req, res) => {
   const { email } = req.body;
 
-  // Here you would typically save the email to a database
-  // For now, we'll just log it and return a success response
-  console.log(`New waitlist signup: ${email}`);
+  try {
+    // Validate email
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address',
+      });
+    }
 
-  // In a real application, you might:
-  // 1. Save to database
-  // 2. Send confirmation email
-  // 3. Add to email marketing service
+    // Try to save to Google Sheets
+    try {
+      await saveToGoogleSheets(email);
+      console.log(`✅ Waitlist signup saved to Google Sheets: ${email}`);
+    } catch (sheetsError) {
+      console.log(`📝 Waitlist signup (Google Sheets not configured): ${email}`);
+      console.log('Google Sheets setup required. See README for instructions.');
+    }
 
-  res.json({
-    success: true,
-    message: 'Successfully added to waitlist!',
-  });
+    res.json({
+      success: true,
+      message: 'Successfully added to waitlist!',
+    });
+  } catch (error) {
+    console.error('Waitlist error:', error);
+    
+    // Fallback to console log
+    console.log(`📝 Waitlist signup (error occurred): ${email}`);
+    
+    res.json({
+      success: true,
+      message: 'Successfully added to waitlist!',
+    });
+  }
 });
 
 // Export the app for Vercel
