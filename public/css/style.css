@@ -6,13 +6,7 @@
 }
 
 body {
-  font-family:
-    'Space Grotesk',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: #ffffff;
   color: #000000;
   line-height: 1.6;
@@ -30,6 +24,35 @@ body {
   position: relative;
 }
 
+/* Logo */
+.logo-container {
+  position: relative;
+  margin-bottom: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 0px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+  height: 120px;
+  width: auto;
+  transition: transform 0.2s ease;
+  background: transparent;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Language Switcher */
 .language-switcher {
   position: fixed;
   top: 20px;
@@ -37,7 +60,6 @@ body {
   z-index: 1000;
 }
 
-/* Dropdown styles */
 .dropdown {
   position: relative;
   display: inline-block;
@@ -113,6 +135,7 @@ body {
   font-weight: 600;
 }
 
+/* Main Content */
 .coming-soon-content {
   display: flex;
   flex-direction: column;
@@ -156,6 +179,7 @@ body {
   line-height: 1.6;
 }
 
+/* Waitlist Form */
 .waitlist-form {
   width: 100%;
   max-width: 500px;
@@ -213,6 +237,7 @@ body {
   transform: translateY(0);
 }
 
+/* Success Message */
 .success-message {
   background: #f0f9ff;
   color: #0369a1;
@@ -239,6 +264,15 @@ body {
 @media (max-width: 768px) {
   .container {
     padding: 20px 16px;
+  }
+
+  .logo-container {
+    margin-bottom: 0px;
+    padding: 0px;
+  }
+
+  .logo {
+    height: 90px;
   }
 
   .language-switcher {
@@ -273,6 +307,15 @@ body {
 }
 
 @media (max-width: 480px) {
+  .logo-container {
+    margin-bottom: 0px;
+    padding: 0px;
+  }
+
+  .logo {
+    height: 75px;
+  }
+
   .language-switcher {
     top: 12px;
     right: 12px;

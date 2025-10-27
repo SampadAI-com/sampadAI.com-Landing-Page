@@ -1,4 +1,3 @@
-// Load environment variables
 require('dotenv').config();
 
 const express = require('express');
@@ -9,191 +8,193 @@ const { google } = require('googleapis');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Google Sheets configuration
-const GOOGLE_SHEETS_CONFIG = {
-  spreadsheetId: process.env.GOOGLE_SHEET_ID,
-  range: 'Waitlist!A:C', // A=Email, B=Date, C=Status
-  credentials: process.env.GOOGLE_SERVICE_ACCOUNT_KEY
-    ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY)
-    : null,
+// Configuration
+const CONFIG = {
+  GOOGLE_SHEETS: {
+    spreadsheetId: process.env.GOOGLE_SHEET_ID,
+    range: 'Waitlist!A:C',
+    credentials: process.env.GOOGLE_SERVICE_ACCOUNT_KEY 
+      ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY) 
+      : null,
+  },
+  GEO_API: {
+    url: 'https://ipapi.co',
+    timeout: 3000,
+    userAgent: 'SampadAI-Landing-Page/1.0',
+  },
+  LANGUAGES: {
+    DE: 'de',
+    PL: 'pl',
+    DEFAULT: 'en',
+  },
 };
 
-// Set EJS as the view engine
+// Middleware setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Parse JSON and URL-encoded bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Helper function to save email to Google Sheets
-async function saveToGoogleSheets(email) {
-  console.log('🔍 Attempting to save to Google Sheets:', email);
+// Utility functions
+const isPrivateIP = (ip) => {
+  const privateRanges = ['127.0.0.1', '::1', '192.168.', '10.'];
+  return privateRanges.some(range => ip === range || ip.startsWith(range));
+};
 
-  if (
-    !GOOGLE_SHEETS_CONFIG.spreadsheetId ||
-    !GOOGLE_SHEETS_CONFIG.credentials
-  ) {
-    console.log('❌ Google Sheets not configured properly');
-    console.log(
-      'Spreadsheet ID:',
-      GOOGLE_SHEETS_CONFIG.spreadsheetId ? '✅' : '❌'
-    );
-    console.log('Credentials:', GOOGLE_SHEETS_CONFIG.credentials ? '✅' : '❌');
-    throw new Error('Google Sheets not configured');
-  }
-
+const getCountryFromIP = async (ip) => {
+  if (isPrivateIP(ip)) return null;
+  
   try {
-    const auth = new google.auth.GoogleAuth({
-      credentials: GOOGLE_SHEETS_CONFIG.credentials,
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    const response = await axios.get(`${CONFIG.GEO_API.url}/${ip}/country/`, {
+      timeout: CONFIG.GEO_API.timeout,
+      headers: { 'User-Agent': CONFIG.GEO_API.userAgent },
     });
-
-    const sheets = google.sheets({ version: 'v4', auth });
-
-    const values = [[email, new Date().toISOString(), 'Active']];
-
-    console.log('📝 Appending to sheet:', GOOGLE_SHEETS_CONFIG.spreadsheetId);
-    const result = await sheets.spreadsheets.values.append({
-      spreadsheetId: GOOGLE_SHEETS_CONFIG.spreadsheetId,
-      range: GOOGLE_SHEETS_CONFIG.range,
-      valueInputOption: 'RAW',
-      resource: { values },
-    });
-
-    console.log('✅ Successfully saved to Google Sheets:', result.data);
-    return result;
-  } catch (error) {
-    console.error('❌ Google Sheets error:', error.message);
-    throw error;
-  }
-}
-
-// Helper function to get country from IP using free API
-async function getCountryFromIP(ip) {
-  try {
-    // Skip geolocation for localhost/private IPs
-    if (
-      ip === '127.0.0.1' ||
-      ip === '::1' ||
-      ip.startsWith('192.168.') ||
-      ip.startsWith('10.')
-    ) {
-      return null;
-    }
-
-    // Use ipapi.co - free, reliable, serverless-friendly
-    const response = await axios.get(`https://ipapi.co/${ip}/country/`, {
-      timeout: 3000, // 3 second timeout
-      headers: {
-        'User-Agent': 'SampadAI-Landing-Page/1.0',
-      },
-    });
-
     return response.data?.trim() || null;
   } catch (error) {
-    // Don't log rate limit errors as warnings - they're expected
-    if (error.response?.status === 429) {
-      console.log('Geolocation API rate limited, using default language');
-    } else {
+    if (error.response?.status !== 429) {
       console.warn('Geolocation API failed:', error.message);
     }
     return null;
   }
-}
+};
+
+const detectLanguage = (country) => {
+  const languageMap = {
+    'DE': CONFIG.LANGUAGES.DE,
+    'PL': CONFIG.LANGUAGES.PL,
+  };
+  return languageMap[country] || CONFIG.LANGUAGES.DEFAULT;
+};
+
+const saveToGoogleSheets = async (email) => {
+  if (!CONFIG.GOOGLE_SHEETS.spreadsheetId || !CONFIG.GOOGLE_SHEETS.credentials) {
+    throw new Error('Google Sheets not configured');
+  }
+
+  const auth = new google.auth.GoogleAuth({
+    credentials: CONFIG.GOOGLE_SHEETS.credentials,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  });
+
+  const sheets = google.sheets({ version: 'v4', auth });
+  const values = [[email, new Date().toISOString(), 'Active']];
+
+  return await sheets.spreadsheets.values.append({
+    spreadsheetId: CONFIG.GOOGLE_SHEETS.spreadsheetId,
+    range: CONFIG.GOOGLE_SHEETS.range,
+    valueInputOption: 'RAW',
+    resource: { values },
+  });
+};
 
 // Language detection middleware
 app.use(async (req, res, next) => {
   try {
-    // Get client IP (considering proxy headers)
-    const clientIP =
-      req.headers['x-forwarded-for'] ||
-      req.headers['x-real-ip'] ||
-      req.socket.remoteAddress ||
-      req.ip;
-
-    // Clean IP address (remove IPv6 prefix if present)
+    const clientIP = req.headers['x-forwarded-for'] || 
+                     req.headers['x-real-ip'] || 
+                     req.socket.remoteAddress || 
+                     req.ip;
+    
     const cleanIP = clientIP ? clientIP.split(',')[0].trim() : '127.0.0.1';
-
-    // Get country code from IP
     const country = await getCountryFromIP(cleanIP);
-
-    // Determine language based on country
-    let language = 'en'; // Default to English
-
-    if (country) {
-      switch (country) {
-        case 'DE':
-          language = 'de';
-          break;
-        case 'PL':
-          language = 'pl';
-          break;
-        default:
-          language = 'en';
-      }
-    }
-
-    // Store language in request object
-    req.language = language;
-    next();
+    req.language = detectLanguage(country);
   } catch (error) {
-    console.error('Language detection middleware error:', error);
-    // Fallback to English if anything fails
-    req.language = 'en';
-    next();
+    console.error('Language detection error:', error);
+    req.language = CONFIG.LANGUAGES.DEFAULT;
   }
+  next();
 });
 
-// Helper function to get messages
+// Content data
 const getMessages = () => ({
   en: {
     title: 'SampadAI',
     tagline: 'Because Your Money Deserves an A+ AI',
     comingSoon: 'Coming Soon',
-    description:
-      'We are building something amazing. Join our waitlist to be the first to know when we launch.',
+    description: 'We are building something amazing. Join our waitlist to be the first to know when we launch.',
     emailPlaceholder: 'Enter your email address',
     joinWaitlist: 'Join Waitlist',
-    successMessage:
-      "Thank you! You've been added to our waitlist. We'll notify you when we launch.",
+    successMessage: "Thank you! You've been added to our waitlist. We'll notify you when we launch.",
+    seo: {
+      title: 'SampadAI - AI-Powered Financial Technology Platform | Fintech Innovation',
+      description: 'Advanced AI financial technology platform. Join our waitlist for early access to intelligent financial solutions.',
+      keywords: 'fintech, AI finance, artificial intelligence financial services, personal finance AI, investment management, financial technology, fintech startup, AI-powered banking, financial innovation, digital banking, smart finance, automated investing, financial AI platform, fintech solutions, banking technology, financial services AI, wealth management AI, fintech Germany, fintech Poland, fintech Berlin, European fintech, financial technology startup, AI financial advisor, robo-advisor, financial planning AI, money management AI, fintech innovation, next-generation banking, financial AI tools, intelligent financial services',
+      canonicalUrl: '/en',
+      locale: 'en_US',
+      geoRegion: 'DE-PL',
+      geoPlacename: 'Berlin, Germany',
+      geoPosition: '52.5200;13.4050',
+      addressCountry: 'DE',
+      addressLocality: 'Berlin',
+    }
   },
   de: {
     title: 'SampadAI',
     tagline: 'Weil Ihr Geld eine A+ KI verdient',
     comingSoon: 'Demnächst verfügbar',
-    description:
-      'Wir entwickeln etwas Großartiges. Treten Sie unserer Warteliste bei, um als Erster zu erfahren, wann wir starten.',
+    description: 'Wir entwickeln etwas Großartiges. Treten Sie unserer Warteliste bei, um als Erster zu erfahren, wann wir starten.',
     emailPlaceholder: 'E-Mail-Adresse eingeben',
     joinWaitlist: 'Warteliste beitreten',
-    successMessage:
-      'Vielen Dank! Sie wurden zu unserer Warteliste hinzugefügt. Wir benachrichtigen Sie, wenn wir starten.',
+    successMessage: 'Vielen Dank! Sie wurden zu unserer Warteliste hinzugefügt. Wir benachrichtigen Sie, wenn wir starten.',
+    seo: {
+      title: 'SampadAI - KI-gestützte Finanztechnologie-Plattform | Fintech Innovation Deutschland',
+      description: 'Fortschrittliche KI-Finanztechnologie-Plattform. Treten Sie unserer Warteliste bei für frühen Zugang zu intelligenten Finanzlösungen.',
+      keywords: 'fintech Deutschland, KI Finanzen, künstliche Intelligenz Finanzdienstleistungen, persönliche Finanzen KI, Investitionsmanagement, Finanztechnologie, fintech startup Deutschland, KI-gestützte Banken, Finanzinnovation, digitales Banking, intelligente Finanzen, automatisierte Investitionen, Finanz-KI-Plattform, fintech Lösungen Deutschland, Banking-Technologie, Finanzdienstleistungen KI, Vermögensverwaltung KI, fintech Berlin, deutsche fintech, europäische fintech, Finanztechnologie startup Deutschland, KI Finanzberater, Robo-Advisor Deutschland, Finanzplanung KI, Geldmanagement KI, fintech Innovation Deutschland, Banking der nächsten Generation, Finanz-KI-Tools, intelligente Finanzdienstleistungen Deutschland',
+      canonicalUrl: '/de',
+      locale: 'de_DE',
+      geoRegion: 'DE',
+      geoPlacename: 'Berlin, Deutschland',
+      geoPosition: '52.5200;13.4050',
+      addressCountry: 'DE',
+      addressLocality: 'Berlin',
+    }
   },
   pl: {
     title: 'SampadAI',
     tagline: 'Ponieważ Twoje pieniądze zasługują na AI klasy A+',
     comingSoon: 'Wkrótce',
-    description:
-      'Tworzymy coś niesamowitego. Dołącz do naszej listy oczekujących, aby jako pierwszy dowiedzieć się o naszym uruchomieniu.',
+    description: 'Tworzymy coś niesamowitego. Dołącz do naszej listy oczekujących, aby jako pierwszy dowiedzieć się o naszym uruchomieniu.',
     emailPlaceholder: 'Wprowadź swój adres e-mail',
     joinWaitlist: 'Dołącz do listy',
-    successMessage:
-      'Dziękujemy! Zostałeś dodany do naszej listy oczekujących. Powiadomimy Cię, gdy uruchomimy serwis.',
+    successMessage: 'Dziękujemy! Zostałeś dodany do naszej listy oczekujących. Powiadomimy Cię, gdy uruchomimy serwis.',
+    seo: {
+      title: 'SampadAI - Platforma Fintech z Sztuczną Inteligencją | Innowacje Fintech Polska',
+      description: 'Zaawansowana platforma AI technologii finansowej. Dołącz do naszej listy oczekujących dla wczesnego dostępu do inteligentnych rozwiązań finansowych.',
+      keywords: 'fintech Polska, AI finanse, sztuczna inteligencja usługi finansowe, finanse osobiste AI, zarządzanie inwestycjami, technologia finansowa, fintech startup Polska, bankowość wspierana przez AI, innowacje finansowe, bankowość cyfrowa, inteligentne finanse, automatyczne inwestowanie, platforma finansowa AI, rozwiązania fintech Polska, technologia bankowa, usługi finansowe AI, zarządzanie majątkiem AI, fintech Warszawa, polski fintech, europejski fintech, startup technologii finansowej Polska, doradca finansowy AI, robo-doradca Polska, planowanie finansowe AI, zarządzanie pieniędzmi AI, innowacje fintech Polska, bankowość nowej generacji, narzędzia finansowe AI, inteligentne usługi finansowe Polska',
+      canonicalUrl: '/pl',
+      locale: 'pl_PL',
+      geoRegion: 'PL',
+      geoPlacename: 'Warszawa, Polska',
+      geoPosition: '52.2297;21.0122',
+      addressCountry: 'PL',
+      addressLocality: 'Warszawa',
+    }
   },
 });
 
-// Helper function to render page
+// Routes
 const renderPage = (req, res, language) => {
-  res.render('index', {
-    language,
-    messages: getMessages(),
-  });
+  res.render('index', { language, messages: getMessages() });
 };
 
-// Routes
+// SEO routes
+app.get('/sitemap.xml', (req, res) => {
+  res.set('Content-Type', 'application/xml');
+  res.sendFile(path.join(__dirname, 'public', 'seo', 'sitemap.xml'));
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.set('Content-Type', 'text/plain');
+  res.sendFile(path.join(__dirname, 'public', 'seo', 'robots.txt'));
+});
+
+app.get('/site.webmanifest', (req, res) => {
+  res.set('Content-Type', 'application/manifest+json');
+  res.sendFile(path.join(__dirname, 'public', 'seo', 'site.webmanifest'));
+});
+
+// Main routes
 app.get('/', (req, res) => renderPage(req, res, req.language));
 app.get('/en', (req, res) => renderPage(req, res, 'en'));
 app.get('/de', (req, res) => renderPage(req, res, 'de'));
@@ -203,50 +204,33 @@ app.get('/pl', (req, res) => renderPage(req, res, 'pl'));
 app.post('/waitlist', async (req, res) => {
   const { email } = req.body;
 
-  try {
-    // Validate email
-    if (!email || !email.includes('@')) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide a valid email address',
-      });
-    }
-
-    // Try to save to Google Sheets
-    try {
-      await saveToGoogleSheets(email);
-      console.log(`✅ Waitlist signup saved to Google Sheets: ${email}`);
-    } catch (sheetsError) {
-      console.log(
-        `📝 Waitlist signup (Google Sheets not configured): ${email}`
-      );
-      console.log('Google Sheets setup required. See README for instructions.');
-    }
-
-    res.json({
-      success: true,
-      message: 'Successfully added to waitlist!',
-    });
-  } catch (error) {
-    console.error('Waitlist error:', error);
-
-    // Fallback to console log
-    console.log(`📝 Waitlist signup (error occurred): ${email}`);
-
-    res.json({
-      success: true,
-      message: 'Successfully added to waitlist!',
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide a valid email address',
     });
   }
+
+  try {
+    await saveToGoogleSheets(email);
+    console.log(`✅ Waitlist signup saved: ${email}`);
+  } catch (error) {
+    console.log(`📝 Waitlist signup (fallback): ${email}`);
+  }
+
+  res.json({
+    success: true,
+    message: 'Successfully added to waitlist!',
+  });
 });
 
-// Export the app for Vercel
+// Export for Vercel
 module.exports = app;
 
-// Only start the server if not in Vercel environment
+// Start server if not in production
 if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Visit http://localhost:${PORT} to see the website`);
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Visit http://localhost:${PORT}`);
   });
 }

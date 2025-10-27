@@ -4,13 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= messages[language].title %></title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="<%= messages[language].seo.description %>">
+    <meta name="keywords" content="<%= messages[language].seo.keywords %>">
+    <meta name="author" content="SampadAI">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="<%= language %>">
+    
+    <!-- Geographic Meta Tags -->
+    <meta name="geo.region" content="<%= messages[language].seo.geoRegion %>">
+    <meta name="geo.placename" content="<%= messages[language].seo.geoPlacename %>">
+    <meta name="geo.position" content="<%= messages[language].seo.geoPosition %>">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sampadai.com<%= messages[language].seo.canonicalUrl %>">
+    <meta property="og:title" content="<%= messages[language].seo.title %>">
+    <meta property="og:description" content="<%= messages[language].seo.description %>">
+    <meta property="og:image" content="https://sampadai.com/assets/images/logo.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:site_name" content="SampadAI">
+    <meta property="og:locale" content="<%= messages[language].seo.locale %>">
+    
+    <!-- Twitter Card -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://sampadai.com<%= messages[language].seo.canonicalUrl %>">
+    <meta property="twitter:title" content="<%= messages[language].seo.title %>">
+    <meta property="twitter:description" content="<%= messages[language].seo.description %>">
+    <meta property="twitter:image" content="https://sampadai.com/assets/images/logo.png">
+    <meta property="twitter:creator" content="@sampadai">
+    <meta property="twitter:site" content="@sampadai">
+    
+    <!-- Canonical & Hreflang -->
+    <link rel="canonical" href="https://sampadai.com<%= messages[language].seo.canonicalUrl %>">
+    <link rel="alternate" hreflang="en" href="https://sampadai.com/en">
+    <link rel="alternate" hreflang="de" href="https://sampadai.com/de">
+    <link rel="alternate" hreflang="pl" href="https://sampadai.com/pl">
+    <link rel="alternate" hreflang="x-default" href="https://sampadai.com/">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/icons/fevicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Google Site Verification -->
     <meta name="google-site-verification" content="s7OvouWdu0qgI4IivX0Qt596WUjWNRlgupQw1X58MqM" />
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "SampadAI",
+        "description": "<%= messages[language].seo.description %>",
+        "url": "https://sampadai.com",
+        "logo": "https://sampadai.com/assets/images/logo.png",
+        "sameAs": [
+            "https://twitter.com/sampadai",
+            "https://linkedin.com/company/sampadai"
+        ],
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "email": "hello@sampadai.com"
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "<%= messages[language].seo.addressCountry %>",
+            "addressLocality": "<%= messages[language].seo.addressLocality %>"
+        },
+        "foundingDate": "2025",
+        "industry": "Financial Technology"
+    }
+    </script>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#000000">
+    <meta name="application-name" content="SampadAI">
+    <meta name="apple-mobile-web-app-title" content="SampadAI">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
     <div class="container">
-        <!-- Language Switcher Dropdown -->
+        <!-- Logo -->
+        <div class="logo-container">
+            <img src="/assets/images/logo.png" alt="SampadAI" class="logo">
+        </div>
+        
+        <!-- Language Switcher -->
         <% if (language !== 'en') { %>
         <div class="language-switcher">
             <div class="dropdown">
@@ -22,20 +112,20 @@
                     <a href="/<%= language %>" class="dropdown-item current">
                         <%= language.toUpperCase() %>
                     </a>
-                    <a href="/en" class="dropdown-item">
-                        EN
-                    </a>
+                    <a href="/en" class="dropdown-item">EN</a>
                 </div>
             </div>
         </div>
         <% } %>
         
+        <!-- Main Content -->
         <div class="coming-soon-content">
             <h1 class="title"><%= messages[language].title %></h1>
             <p class="tagline"><%= messages[language].tagline %></p>
             <h2 class="coming-soon"><%= messages[language].comingSoon %></h2>
             <p class="description"><%= messages[language].description %></p>
             
+            <!-- Waitlist Form -->
             <form class="waitlist-form" action="/waitlist" method="POST">
                 <div class="form-group">
                     <input 
@@ -51,6 +141,7 @@
                 </div>
             </form>
             
+            <!-- Success Message -->
             <div class="success-message" id="successMessage" style="display: none;">
                 <%= messages[language].successMessage %>
             </div>
@@ -58,20 +149,18 @@
     </div>
 
     <script>
-        // Dropdown functionality
+        // Language dropdown functionality
         function toggleDropdown() {
-            const dropdown = document.getElementById('languageDropdown');
-            dropdown.classList.toggle('show');
+            document.getElementById('languageDropdown').classList.toggle('show');
         }
         
         // Close dropdown when clicking outside
         window.onclick = function(event) {
             if (!event.target.matches('.dropdown-toggle')) {
                 const dropdowns = document.getElementsByClassName('dropdown-menu');
-                for (let i = 0; i < dropdowns.length; i++) {
-                    const openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
+                for (let dropdown of dropdowns) {
+                    if (dropdown.classList.contains('show')) {
+                        dropdown.classList.remove('show');
                     }
                 }
             }
@@ -90,19 +179,15 @@
             submitButton.disabled = true;
             
             try {
-                // Submit to backend
                 const response = await fetch('/waitlist', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
                 });
                 
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Show success message
                     this.style.display = 'none';
                     successMessage.style.display = 'block';
                 } else {
@@ -110,7 +195,6 @@
                 }
             } catch (error) {
                 console.error('Waitlist error:', error);
-                // Reset button state
                 submitButton.textContent = '<%= messages[language].joinWaitlist %>';
                 submitButton.disabled = false;
                 alert('Failed to join waitlist. Please try again.');
