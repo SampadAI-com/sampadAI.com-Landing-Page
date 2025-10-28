@@ -224,6 +224,42 @@ app.post('/waitlist', async (req, res) => {
   });
 });
 
+app.get('/rsvp', (req, res) => {
+  res.render('rsvp', {
+    title: 'Boxed with love',
+    date: '17.02.24',
+    eventTime: '14 Feb | 6:00PM'
+  });
+});
+
+// RSVP submission route
+app.post('/rsvp', async (req, res) => {
+  const { name, guests } = req.body;
+
+  if (!name || !guests) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide your name and number of attendees',
+    });
+  }
+
+  try {
+    // Here you could save to a database or send notifications
+    console.log(`✅ RSVP received: ${name} with ${guests} guest(s)`);
+    
+    res.json({
+      success: true,
+      message: 'Thank you! Your RSVP has been received.',
+    });
+  } catch (error) {
+    console.error('RSVP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to process RSVP. Please try again.',
+    });
+  }
+});
+
 // Export for Vercel
 module.exports = app;
 
