@@ -13,8 +13,8 @@ const CONFIG = {
   GOOGLE_SHEETS: {
     spreadsheetId: process.env.GOOGLE_SHEET_ID,
     range: 'Waitlist!A:C',
-    credentials: process.env.GOOGLE_SERVICE_ACCOUNT_KEY 
-      ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY) 
+    credentials: process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+      ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY)
       : null,
   },
   GEO_API: {
@@ -37,14 +37,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Utility functions
-const isPrivateIP = (ip) => {
+const isPrivateIP = ip => {
   const privateRanges = ['127.0.0.1', '::1', '192.168.', '10.'];
   return privateRanges.some(range => ip === range || ip.startsWith(range));
 };
 
-const getCountryFromIP = async (ip) => {
+const getCountryFromIP = async ip => {
   if (isPrivateIP(ip)) return null;
-  
+
   try {
     const response = await axios.get(`${CONFIG.GEO_API.url}/${ip}/country/`, {
       timeout: CONFIG.GEO_API.timeout,
@@ -59,16 +59,19 @@ const getCountryFromIP = async (ip) => {
   }
 };
 
-const detectLanguage = (country) => {
+const detectLanguage = country => {
   const languageMap = {
-    'DE': CONFIG.LANGUAGES.DE,
-    'PL': CONFIG.LANGUAGES.PL,
+    DE: CONFIG.LANGUAGES.DE,
+    PL: CONFIG.LANGUAGES.PL,
   };
   return languageMap[country] || CONFIG.LANGUAGES.DEFAULT;
 };
 
-const saveToGoogleSheets = async (email) => {
-  if (!CONFIG.GOOGLE_SHEETS.spreadsheetId || !CONFIG.GOOGLE_SHEETS.credentials) {
+const saveToGoogleSheets = async email => {
+  if (
+    !CONFIG.GOOGLE_SHEETS.spreadsheetId ||
+    !CONFIG.GOOGLE_SHEETS.credentials
+  ) {
     throw new Error('Google Sheets not configured');
   }
 
@@ -91,11 +94,12 @@ const saveToGoogleSheets = async (email) => {
 // Language detection middleware
 app.use(async (req, res, next) => {
   try {
-    const clientIP = req.headers['x-forwarded-for'] || 
-                     req.headers['x-real-ip'] || 
-                     req.socket.remoteAddress || 
-                     req.ip;
-    
+    const clientIP =
+      req.headers['x-forwarded-for'] ||
+      req.headers['x-real-ip'] ||
+      req.socket.remoteAddress ||
+      req.ip;
+
     const cleanIP = clientIP ? clientIP.split(',')[0].trim() : '127.0.0.1';
     const country = await getCountryFromIP(cleanIP);
     req.language = detectLanguage(country);
@@ -112,14 +116,20 @@ const getMessages = () => ({
     title: 'SampadAI',
     tagline: 'Because Your Money Deserves an A+ AI',
     comingSoon: 'Coming Soon',
-    description: 'We are building something amazing. Join our waitlist to be the first to know when we launch.',
+    description:
+      'We are building something amazing. Join our waitlist to be the first to know when we launch.',
     emailPlaceholder: 'Enter your email address',
     joinWaitlist: 'Join Waitlist',
-    successMessage: "Thank you! You've been added to our waitlist. We'll notify you when we launch.",
+    successMessage:
+      "Thank you! You've been added to our waitlist. We'll notify you when we launch.",
+    tryBetaNow: 'Try Beta Now',
     seo: {
-      title: 'SampadAI - AI-Powered Financial Technology Platform | Fintech Innovation',
-      description: 'Advanced AI financial technology platform. Join our waitlist for early access to intelligent financial solutions.',
-      keywords: 'fintech, AI finance, artificial intelligence financial services, personal finance AI, investment management, financial technology, fintech startup, AI-powered banking, financial innovation, digital banking, smart finance, automated investing, financial AI platform, fintech solutions, banking technology, financial services AI, wealth management AI, fintech Germany, fintech Poland, fintech Berlin, European fintech, financial technology startup, AI financial advisor, robo-advisor, financial planning AI, money management AI, fintech innovation, next-generation banking, financial AI tools, intelligent financial services',
+      title:
+        'SampadAI - AI-Powered Financial Technology Platform | Fintech Innovation',
+      description:
+        'Advanced AI financial technology platform. Join our waitlist for early access to intelligent financial solutions.',
+      keywords:
+        'fintech, AI finance, artificial intelligence financial services, personal finance AI, investment management, financial technology, fintech startup, AI-powered banking, financial innovation, digital banking, smart finance, automated investing, financial AI platform, fintech solutions, banking technology, financial services AI, wealth management AI, fintech Germany, fintech Poland, fintech Berlin, European fintech, financial technology startup, AI financial advisor, robo-advisor, financial planning AI, money management AI, fintech innovation, next-generation banking, financial AI tools, intelligent financial services',
       canonicalUrl: '/en',
       locale: 'en_US',
       geoRegion: 'DE-PL',
@@ -127,20 +137,26 @@ const getMessages = () => ({
       geoPosition: '52.5200;13.4050',
       addressCountry: 'DE',
       addressLocality: 'Berlin',
-    }
+    },
   },
   de: {
     title: 'SampadAI',
     tagline: 'Weil Ihr Geld eine A+ KI verdient',
     comingSoon: 'Demnächst verfügbar',
-    description: 'Wir entwickeln etwas Großartiges. Treten Sie unserer Warteliste bei, um als Erster zu erfahren, wann wir starten.',
+    description:
+      'Wir entwickeln etwas Großartiges. Treten Sie unserer Warteliste bei, um als Erster zu erfahren, wann wir starten.',
     emailPlaceholder: 'E-Mail-Adresse eingeben',
     joinWaitlist: 'Warteliste beitreten',
-    successMessage: 'Vielen Dank! Sie wurden zu unserer Warteliste hinzugefügt. Wir benachrichtigen Sie, wenn wir starten.',
+    successMessage:
+      'Vielen Dank! Sie wurden zu unserer Warteliste hinzugefügt. Wir benachrichtigen Sie, wenn wir starten.',
+    tryBetaNow: 'Beta jetzt testen',
     seo: {
-      title: 'SampadAI - KI-gestützte Finanztechnologie-Plattform | Fintech Innovation Deutschland',
-      description: 'Fortschrittliche KI-Finanztechnologie-Plattform. Treten Sie unserer Warteliste bei für frühen Zugang zu intelligenten Finanzlösungen.',
-      keywords: 'fintech Deutschland, KI Finanzen, künstliche Intelligenz Finanzdienstleistungen, persönliche Finanzen KI, Investitionsmanagement, Finanztechnologie, fintech startup Deutschland, KI-gestützte Banken, Finanzinnovation, digitales Banking, intelligente Finanzen, automatisierte Investitionen, Finanz-KI-Plattform, fintech Lösungen Deutschland, Banking-Technologie, Finanzdienstleistungen KI, Vermögensverwaltung KI, fintech Berlin, deutsche fintech, europäische fintech, Finanztechnologie startup Deutschland, KI Finanzberater, Robo-Advisor Deutschland, Finanzplanung KI, Geldmanagement KI, fintech Innovation Deutschland, Banking der nächsten Generation, Finanz-KI-Tools, intelligente Finanzdienstleistungen Deutschland',
+      title:
+        'SampadAI - KI-gestützte Finanztechnologie-Plattform | Fintech Innovation Deutschland',
+      description:
+        'Fortschrittliche KI-Finanztechnologie-Plattform. Treten Sie unserer Warteliste bei für frühen Zugang zu intelligenten Finanzlösungen.',
+      keywords:
+        'fintech Deutschland, KI Finanzen, künstliche Intelligenz Finanzdienstleistungen, persönliche Finanzen KI, Investitionsmanagement, Finanztechnologie, fintech startup Deutschland, KI-gestützte Banken, Finanzinnovation, digitales Banking, intelligente Finanzen, automatisierte Investitionen, Finanz-KI-Plattform, fintech Lösungen Deutschland, Banking-Technologie, Finanzdienstleistungen KI, Vermögensverwaltung KI, fintech Berlin, deutsche fintech, europäische fintech, Finanztechnologie startup Deutschland, KI Finanzberater, Robo-Advisor Deutschland, Finanzplanung KI, Geldmanagement KI, fintech Innovation Deutschland, Banking der nächsten Generation, Finanz-KI-Tools, intelligente Finanzdienstleistungen Deutschland',
       canonicalUrl: '/de',
       locale: 'de_DE',
       geoRegion: 'DE',
@@ -148,20 +164,26 @@ const getMessages = () => ({
       geoPosition: '52.5200;13.4050',
       addressCountry: 'DE',
       addressLocality: 'Berlin',
-    }
+    },
   },
   pl: {
     title: 'SampadAI',
     tagline: 'Ponieważ Twoje pieniądze zasługują na AI klasy A+',
     comingSoon: 'Wkrótce',
-    description: 'Tworzymy coś niesamowitego. Dołącz do naszej listy oczekujących, aby jako pierwszy dowiedzieć się o naszym uruchomieniu.',
+    description:
+      'Tworzymy coś niesamowitego. Dołącz do naszej listy oczekujących, aby jako pierwszy dowiedzieć się o naszym uruchomieniu.',
     emailPlaceholder: 'Wprowadź swój adres e-mail',
     joinWaitlist: 'Dołącz do listy',
-    successMessage: 'Dziękujemy! Zostałeś dodany do naszej listy oczekujących. Powiadomimy Cię, gdy uruchomimy serwis.',
+    successMessage:
+      'Dziękujemy! Zostałeś dodany do naszej listy oczekujących. Powiadomimy Cię, gdy uruchomimy serwis.',
+    tryBetaNow: 'Wypróbuj wersję beta',
     seo: {
-      title: 'SampadAI - Platforma Fintech z Sztuczną Inteligencją | Innowacje Fintech Polska',
-      description: 'Zaawansowana platforma AI technologii finansowej. Dołącz do naszej listy oczekujących dla wczesnego dostępu do inteligentnych rozwiązań finansowych.',
-      keywords: 'fintech Polska, AI finanse, sztuczna inteligencja usługi finansowe, finanse osobiste AI, zarządzanie inwestycjami, technologia finansowa, fintech startup Polska, bankowość wspierana przez AI, innowacje finansowe, bankowość cyfrowa, inteligentne finanse, automatyczne inwestowanie, platforma finansowa AI, rozwiązania fintech Polska, technologia bankowa, usługi finansowe AI, zarządzanie majątkiem AI, fintech Warszawa, polski fintech, europejski fintech, startup technologii finansowej Polska, doradca finansowy AI, robo-doradca Polska, planowanie finansowe AI, zarządzanie pieniędzmi AI, innowacje fintech Polska, bankowość nowej generacji, narzędzia finansowe AI, inteligentne usługi finansowe Polska',
+      title:
+        'SampadAI - Platforma Fintech z Sztuczną Inteligencją | Innowacje Fintech Polska',
+      description:
+        'Zaawansowana platforma AI technologii finansowej. Dołącz do naszej listy oczekujących dla wczesnego dostępu do inteligentnych rozwiązań finansowych.',
+      keywords:
+        'fintech Polska, AI finanse, sztuczna inteligencja usługi finansowe, finanse osobiste AI, zarządzanie inwestycjami, technologia finansowa, fintech startup Polska, bankowość wspierana przez AI, innowacje finansowe, bankowość cyfrowa, inteligentne finanse, automatyczne inwestowanie, platforma finansowa AI, rozwiązania fintech Polska, technologia bankowa, usługi finansowe AI, zarządzanie majątkiem AI, fintech Warszawa, polski fintech, europejski fintech, startup technologii finansowej Polska, doradca finansowy AI, robo-doradca Polska, planowanie finansowe AI, zarządzanie pieniędzmi AI, innowacje fintech Polska, bankowość nowej generacji, narzędzia finansowe AI, inteligentne usługi finansowe Polska',
       canonicalUrl: '/pl',
       locale: 'pl_PL',
       geoRegion: 'PL',
@@ -169,7 +191,7 @@ const getMessages = () => ({
       geoPosition: '52.2297;21.0122',
       addressCountry: 'PL',
       addressLocality: 'Warszawa',
-    }
+    },
   },
 });
 
@@ -228,7 +250,7 @@ app.get('/rsvp', (req, res) => {
   res.render('rsvp', {
     title: 'Boxed with love',
     date: '17.02.24',
-    eventTime: '14 Feb | 6:00PM'
+    eventTime: '14 Feb | 6:00PM',
   });
 });
 
@@ -246,7 +268,7 @@ app.post('/rsvp', async (req, res) => {
   try {
     // Here you could save to a database or send notifications
     console.log(`✅ RSVP received: ${name} with ${guests} guest(s)`);
-    
+
     res.json({
       success: true,
       message: 'Thank you! Your RSVP has been received.',
