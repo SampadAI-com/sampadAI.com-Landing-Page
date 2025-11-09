@@ -65,7 +65,7 @@ const detectLanguage = country => {
   return languageMap[country] || CONFIG.LANGUAGES.DEFAULT;
 };
 
-const saveToGoogleSheets = async email => {
+const saveToGoogleSheets = async (email, country) => {
   if (
     !CONFIG.GOOGLE_SHEETS.spreadsheetId ||
     !CONFIG.GOOGLE_SHEETS.credentials
@@ -80,11 +80,11 @@ const saveToGoogleSheets = async email => {
   });
 
   const sheets = google.sheets({ version: 'v4', auth });
-  const values = [[email, new Date().toISOString(), 'Active']];
+  const values = [[email, new Date().toISOString(), 'Active', country]];
 
   return await sheets.spreadsheets.values.append({
     spreadsheetId: CONFIG.GOOGLE_SHEETS.spreadsheetId,
-    range: CONFIG.GOOGLE_SHEETS.range,
+    range: 'Waitlist!A:D',
     valueInputOption: 'RAW',
     resource: { values },
   });
@@ -223,7 +223,7 @@ app.get('/pl', (req, res) => renderPage(req, res, 'pl'));
 
 // Waitlist route
 app.post('/waitlist', async (req, res) => {
-  const { email } = req.body;
+  const { email, country } = req.body;
 
   if (!email || !email.includes('@')) {
     return res.status(400).json({
@@ -233,8 +233,8 @@ app.post('/waitlist', async (req, res) => {
   }
 
   try {
-    await saveToGoogleSheets(email);
-    console.log(`✅ Waitlist signup saved: ${email}`);
+    await saveToGoogleSheets(email, country);
+    console.log(`✅ Waitlist signup saved: ${email} from ${country}`);
   } catch (error) {
     console.log(`📝 Waitlist signup (fallback): ${email}`);
   }

@@ -149,6 +149,13 @@
                         required 
                         class="email-input"
                     >
+                    <input 
+                        type="text" 
+                        name="country" 
+                        placeholder="Country" 
+                        required 
+                        class="email-input"
+                    >
                     <button type="submit" class="join-button">
                         <%= messages[language].joinWaitlist %>
                     </button>
@@ -220,6 +227,7 @@
             e.preventDefault();
             
             const email = this.querySelector('input[name="email"]').value;
+            const country = this.querySelector('input[name="country"]').value;
             const successMessage = document.getElementById('successMessage');
             const submitButton = this.querySelector('button[type="submit"]');
             
@@ -231,7 +239,7 @@
                 const response = await fetch('/waitlist', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({ email, country })
                 });
                 
                 const result = await response.json();
