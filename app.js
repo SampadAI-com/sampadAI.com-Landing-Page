@@ -248,6 +248,15 @@ app.post('/waitlist', async (req, res) => {
   });
 });
 
+app.get('/new', (req, res) => {
+  // Support language override via query parameter
+  const lang = req.query.lang || req.language;
+  res.render('new', {
+    language: lang,
+    messages: getMessages(),
+  });
+});
+
 app.get('/rsvp', (req, res) => {
   res.render('rsvp', {
     title: 'Boxed with love',
