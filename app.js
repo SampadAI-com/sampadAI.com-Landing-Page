@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 const CONFIG = {
   GOOGLE_SHEETS: {
     spreadsheetId: process.env.GOOGLE_SHEET_ID,
-    range: 'Waitlist!A:C',
+    range: 'Waitlist!A:D',
     credentials: process.env.GOOGLE_SERVICE_ACCOUNT_KEY || null,
   },
   GEO_API: {
