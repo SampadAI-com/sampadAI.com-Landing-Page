@@ -101,9 +101,11 @@ app.use(async (req, res, next) => {
 
     const cleanIP = clientIP ? clientIP.split(',')[0].trim() : '127.0.0.1';
     const country = await getCountryFromIP(cleanIP);
+    req.country = country;
     req.language = detectLanguage(country);
   } catch (error) {
     console.error('Language detection error:', error);
+    req.country = null;
     req.language = CONFIG.LANGUAGES.DEFAULT;
   }
   next();
@@ -223,7 +225,8 @@ app.get('/pl', (req, res) => renderPage(req, res, 'pl'));
 
 // Waitlist route
 app.post('/waitlist', async (req, res) => {
-  const { email, country } = req.body;
+  const { email } = req.body;
+  const { country } = req;
 
   if (!email || !email.includes('@')) {
     return res.status(400).json({
@@ -234,7 +237,7 @@ app.post('/waitlist', async (req, res) => {
 
   try {
     await saveToGoogleSheets(email, country);
-    console.log(`✅ Waitlist signup saved: ${email} from ${country}`);
+    console.log(`✅ Waitlist signup saved: ${email}${country ? ` from ${country}` : ''}`);
   } catch (error) {
     console.log(`📝 Waitlist signup (fallback): ${email}`);
   }
