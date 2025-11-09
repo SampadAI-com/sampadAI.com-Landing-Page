@@ -13,9 +13,7 @@ const CONFIG = {
   GOOGLE_SHEETS: {
     spreadsheetId: process.env.GOOGLE_SHEET_ID,
     range: 'Waitlist!A:C',
-    credentials: process.env.GOOGLE_SERVICE_ACCOUNT_KEY
-      ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY)
-      : null,
+    credentials: process.env.GOOGLE_SERVICE_ACCOUNT_KEY || null,
   },
   GEO_API: {
     url: 'https://ipapi.co',
@@ -75,8 +73,9 @@ const saveToGoogleSheets = async email => {
     throw new Error('Google Sheets not configured');
   }
 
+  const creds = JSON.parse(CONFIG.GOOGLE_SHEETS.credentials);
   const auth = new google.auth.GoogleAuth({
-    credentials: CONFIG.GOOGLE_SHEETS.credentials,
+    credentials: creds,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
 
