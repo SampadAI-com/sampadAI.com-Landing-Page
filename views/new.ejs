@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="<%= language %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SampadAI - Your Money Deserves an A+ AI</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="<%= messages[language].seo.description %>">
+    <meta name="keywords" content="<%= messages[language].seo.keywords %>">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="SampadAI - AI-Powered Financial Technology">
+    <meta property="og:description" content="<%= messages[language].seo.description %>">
+    <meta property="og:image" content="https://sampadai.com/assets/images/logo.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/icons/fevicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/logo.png">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/new-style.css">
+    
+    <style>
+        /* Additional inline styles for specific elements */
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: floatShape 20s infinite ease-in-out;
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape-2 {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            right: 10%;
+            animation-delay: 5s;
+        }
+        
+        .shape-3 {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            left: 50%;
+            animation-delay: 10s;
+        }
+        
+        @keyframes floatShape {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate(30px, -30px) rotate(120deg);
+            }
+            66% {
+                transform: translate(-20px, 20px) rotate(240deg);
+            }
+        }
+        
+        .gradient-text {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: var(--spacing-md);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <div class="theme-toggle-container">
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+            <span class="theme-icon">🌙</span>
+        </button>
+    </div>
+
+    <!-- Language Switcher -->
+    <% if (language !== 'en') { %>
+    <div class="language-switcher">
+        <div class="dropdown">
+            <button class="dropdown-toggle" onclick="toggleDropdown()">
+                <%= language.toUpperCase() %>
+                <span class="dropdown-arrow">▼</span>
+            </button>
+            <div class="dropdown-menu" id="languageDropdown">
+                <a href="/new?lang=<%= language %>" class="dropdown-item current">
+                    <%= language.toUpperCase() %>
+                </a>
+                <a href="/new?lang=en" class="dropdown-item">EN</a>
+            </div>
+        </div>
+    </div>
+    <% } %>
+    
+    <div class="animated-bg">
+        <div class="liquid-blob blob-1"></div>
+        <div class="liquid-blob blob-2"></div>
+    </div>
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title"><%= messages[language].title %></h1>
+                <p class="hero-subtitle"><%= messages[language].tagline %></p>
+                <p class="hero-subtitle" style="font-size: 1.25rem; margin-top: 1rem;">
+                    <%= messages[language].description %>
+                </p>
+                <div class="hero-cta">
+                    <a href="https://beta.sampadai.com" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                        </svg>
+                        <%= messages[language].tryBetaNow %>
+                    </a>
+                    <a href="#waitlist" class="btn btn-secondary"><%= messages[language].joinWaitlist %></a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator"></div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="section" id="features">
+        <div class="container">
+            <h2 class="section-title">
+                <% if (language === 'de') { %>
+                    Leistungsstarke Funktionen
+                <% } else if (language === 'pl') { %>
+                    Potężne Funkcje
+                <% } else { %>
+                    Powerful Features
+                <% } %>
+            </h2>
+            <div class="features">
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">💎</div>
+                    <h3 class="feature-title">AI-Powered Insights</h3>
+                    <p class="feature-description">
+                        Get personalized financial recommendations powered by advanced AI. Understand your spending patterns and make smarter decisions.
+                    </p>
+                </div>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Smart Budgeting</h3>
+                    <p class="feature-description">
+                        Create intelligent budgets that adapt to your lifestyle. Set goals and track your progress with beautiful, easy-to-understand visuals.
+                    </p>
+                </div>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Secure & Private</h3>
+                    <p class="feature-description">
+                        Your financial data is encrypted and secure. We use bank-level security to protect your information and privacy.
+                    </p>
+                </div>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Real-Time Analytics</h3>
+                    <p class="feature-description">
+                        See your financial health at a glance with real-time analytics and beautiful charts. Understand where your money goes.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- App Screenshots Section -->
+    <section class="section screenshots" id="screenshots">
+        <div class="container">
+            <h2 class="section-title">
+                <% if (language === 'de') { %>
+                    SampadAI in Aktion
+                <% } else if (language === 'pl') { %>
+                    Zobacz SampadAI w akcji
+                <% } else { %>
+                    See SampadAI in Action
+                <% } %>
+            </h2>
+            <p class="text-center" style="color: var(--text-primary); margin-bottom: var(--spacing-lg); opacity: 0.9;">
+                <% if (language === 'de') { %>
+                    Schönes, intuitives Design, das das Verwalten Ihrer Finanzen zu einer Freude macht
+                <% } else if (language === 'pl') { %>
+                    Piękny, intuicyjny design, który sprawia, że zarządzanie finansami to przyjemność
+                <% } else { %>
+                    Beautiful, intuitive design that makes managing your finances a joy
+                <% } %>
+            </p>
+            <div class="screenshots-grid">
+                <!-- Placeholder for screenshots - replace with actual images -->
+                <div class="screenshot-card">
+                    <div style="background: var(--gradient-1); height: 500px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                        📱 App Screenshot 1
+                    </div>
+                </div>
+                <div class="screenshot-card">
+                    <div style="background: var(--gradient-2); height: 500px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                        📱 App Screenshot 2
+                    </div>
+                </div>
+                <div class="screenshot-card">
+                    <div style="background: var(--gradient-3); height: 500px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                        📱 App Screenshot 3
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Trusted by Thousands</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">$2M+</div>
+                    <div class="stat-label">Managed Assets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4.9★</div>
+                    <div class="stat-label">App Rating</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">Transactions</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Waitlist Section -->
+    <section class="section" id="waitlist" style="background: var(--gradient-soft); border-radius: var(--radius-lg); padding: var(--spacing-xl); margin: var(--spacing-xl) 0;">
+        <div class="container">
+            <h2 class="section-title"><%= messages[language].joinWaitlist %></h2>
+            <p class="text-center" style="color: var(--text-primary); margin-bottom: var(--spacing-lg); max-width: 600px; margin-left: auto; margin-right: auto; opacity: 0.9;">
+                <%= messages[language].description %>
+            </p>
+            <form class="waitlist-form" action="/waitlist" method="POST" style="max-width: 500px; margin: 0 auto;">
+                <div style="display: flex; gap: var(--spacing-sm); flex-wrap: wrap;">
+                    <input 
+                        type="email" 
+                        name="email" 
+                        placeholder="<%= messages[language].emailPlaceholder %>" 
+                        required 
+                        style="flex: 1; min-width: 250px; padding: 1rem 1.5rem; border: 1px solid var(--glass-border); border-radius: var(--radius-full); background: var(--white); font-size: 1rem; outline: none; transition: all 0.3s ease;"
+                        onfocus="this.style.borderColor='var(--primary-pink)'; this.style.boxShadow='0 0 0 3px rgba(255, 107, 157, 0.1)'"
+                        onblur="this.style.borderColor='var(--glass-border)'; this.style.boxShadow='none'"
+                    >
+                    <button type="submit" class="btn btn-primary" style="white-space: nowrap;">
+                        <%= messages[language].joinWaitlist %>
+                    </button>
+                </div>
+            </form>
+            <div id="successMessage" style="display: none; margin-top: var(--spacing-md); padding: var(--spacing-md); background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: var(--radius-md); text-align: center; color: var(--text-primary); border: 1px solid var(--glass-border);">
+                ✅ <%= messages[language].successMessage %>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer style="padding: var(--spacing-lg) 0; text-align: center; color: var(--text-secondary); border-top: 1px solid var(--gray-medium); margin-top: var(--spacing-xl);">
+        <div class="container">
+            <p style="margin-bottom: var(--spacing-sm);">
+                <strong style="color: var(--text-primary);">SampadAI</strong> - Your Money Deserves an A+ AI
+            </p>
+            <p style="font-size: 0.9rem;">
+                © 2025 SampadAI. All rights reserved.
+            </p>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script>
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            observer.observe(card);
+        });
+        
+        // Observe screenshot cards
+        document.querySelectorAll('.screenshot-card').forEach(card => {
+            observer.observe(card);
+        });
+        
+        // Waitlist form handling
+        const waitlistForm = document.querySelector('.waitlist-form');
+        if (waitlistForm) {
+            waitlistForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const email = waitlistForm.querySelector('input[name="email"]').value;
+                const submitButton = waitlistForm.querySelector('button[type="submit"]');
+                const successMessage = document.getElementById('successMessage');
+                
+                submitButton.textContent = 'Joining...';
+                submitButton.disabled = true;
+                
+                try {
+                    const response = await fetch('/waitlist', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        waitlistForm.style.display = 'none';
+                        successMessage.style.display = 'block';
+                    } else {
+                        throw new Error(result.message || 'Failed to join waitlist');
+                    }
+                } catch (error) {
+                    console.error('Waitlist error:', error);
+                    submitButton.textContent = 'Join Waitlist';
+                    submitButton.disabled = false;
+                    alert('Failed to join waitlist. Please try again.');
+                }
+            });
+        }
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Theme/Dark Mode functionality
+        function getTheme() {
+            return localStorage.getItem('theme') || 'light';
+        }
+
+        function setTheme(theme) {
+            localStorage.setItem('theme', theme);
+            document.documentElement.setAttribute('data-theme', theme);
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = document.querySelector('.theme-icon');
+            const theme = getTheme();
+            if (icon) {
+                icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = getTheme();
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        }
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTheme(getTheme());
+        });
+
+        // Language dropdown functionality
+        function toggleDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+        
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-toggle')) {
+                const dropdowns = document.getElementsByClassName('dropdown-menu');
+                for (let dropdown of dropdowns) {
+                    if (dropdown.classList.contains('show')) {
+                        dropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
