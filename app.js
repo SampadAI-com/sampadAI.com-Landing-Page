@@ -115,7 +115,7 @@ app.use(async (req, res, next) => {
 const getMessages = () => ({
   en: {
     title: 'SampadAI',
-    tagline: 'Because Your Money Deserves an A+ AI',
+    tagline: 'Her Wealth. Her Data. Her AI.',
     comingSoon: 'Coming Soon',
     description:
       'We are building something amazing. Join our waitlist to be the first to know when we launch.',
@@ -142,7 +142,7 @@ const getMessages = () => ({
   },
   de: {
     title: 'SampadAI',
-    tagline: 'Weil Ihr Geld eine A+ KI verdient',
+    tagline: 'Her Wealth. Her Data. Her AI.',
     comingSoon: 'Demnächst verfügbar',
     description:
       'Wir entwickeln etwas Großartiges. Treten Sie unserer Warteliste bei, um als Erster zu erfahren, wann wir starten.',
@@ -169,7 +169,7 @@ const getMessages = () => ({
   },
   pl: {
     title: 'SampadAI',
-    tagline: 'Ponieważ Twoje pieniądze zasługują na AI klasy A+',
+    tagline: 'Her Wealth. Her Data. Her AI.',
     comingSoon: 'Wkrótce',
     description:
       'Tworzymy coś niesamowitego. Dołącz do naszej listy oczekujących, aby jako pierwszy dowiedzieć się o naszym uruchomieniu.',
