@@ -217,20 +217,23 @@ body::before {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 48px;
+  margin-bottom: 8px;
   position: relative;
+  padding: 0;
+  min-height: auto;
 }
 
 .logo {
-  height: 100px;
+  height: 180px;
   width: auto;
   padding: 12px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   filter: drop-shadow(0 4px 12px var(--shadow-soft));
+  object-fit: contain;
 }
 
 .logo:hover {
-  transform: scale(1.08) translateY(-2px);
+  transform: scale(1.1) translateY(-2px);
   filter: drop-shadow(0 8px 20px var(--shadow-medium));
 }
 
@@ -354,6 +357,7 @@ body::before {
   flex-direction: column;
   align-items: center;
   gap: 40px;
+  margin-top: 0;
   animation: fadeInUp 1s ease-out 0.2s both;
 }
 
@@ -363,6 +367,7 @@ body::before {
   color: var(--text-primary);
   letter-spacing: -0.03em;
   line-height: 1.1;
+  margin-top: 0;
   margin-bottom: 16px;
   animation: fadeInUp 1s ease-out 0.3s both;
 }
@@ -600,11 +605,13 @@ html {
   }
 
   .logo {
-    height: 85px;
+    height: 140px;
   }
 
   .logo-container {
-    margin-bottom: 40px;
+    margin-bottom: 6px;
+    min-height: auto;
+    padding: 0;
   }
 
   .theme-toggle-container {
@@ -670,11 +677,13 @@ html {
   }
 
   .logo {
-    height: 70px;
+    height: 120px;
   }
 
   .logo-container {
-    margin-bottom: 32px;
+    margin-bottom: 4px;
+    min-height: auto;
+    padding: 0;
   }
 
   .theme-toggle-container {

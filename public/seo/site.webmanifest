@@ -9,24 +9,19 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/assets/images/logo.png",
-      "sizes": "any",
+      "src": "/assets/images/new/favicon-180x180.png",
+      "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "/assets/icons/favicon-32x32.png",
+      "src": "/assets/images/new/favicon-32x32.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "/assets/icons/favicon-16x16.png",
+      "src": "/assets/images/new/favicon-16x16.png",
       "sizes": "16x16",
       "type": "image/png"
-    },
-    {
-      "src": "/assets/icons/fevicon.ico",
-      "sizes": "16x16",
-      "type": "image/x-icon"
     }
   ],
   "categories": ["finance", "business", "productivity"],

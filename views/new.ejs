@@ -12,11 +12,12 @@
     <!-- Open Graph -->
     <meta property="og:title" content="SampadAI - AI-Powered Financial Technology">
     <meta property="og:description" content="<%= messages[language].seo.description %>">
-    <meta property="og:image" content="https://sampadai.com/assets/images/logo.png">
+    <meta property="og:image" content="https://sampadai.com/assets/images/new/sampadai_light.png">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/assets/icons/fevicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/new/favicon-32x32.png" id="favicon32">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/new/favicon-16x16.png" id="favicon16">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/new/favicon-180x180.png">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -416,6 +417,31 @@
             localStorage.setItem('theme', theme);
             document.documentElement.setAttribute('data-theme', theme);
             updateThemeIcon();
+            updateLogo(theme);
+        }
+
+        function updateLogo(theme) {
+            const logos = document.querySelectorAll('.logo, [data-logo]');
+            logos.forEach(logo => {
+                if (logo.tagName === 'IMG') {
+                    logo.src = theme === 'dark' 
+                        ? '/assets/images/new/sampadai_dark.png' 
+                        : '/assets/images/new/sampadai_light.png';
+                }
+            });
+            // Update favicons based on theme
+            const favicon16 = document.getElementById('favicon16');
+            const favicon32 = document.getElementById('favicon32');
+            if (favicon16) {
+                favicon16.href = theme === 'dark' 
+                    ? '/assets/images/new/favicon-dark-16x16.png' 
+                    : '/assets/images/new/favicon-16x16.png';
+            }
+            if (favicon32) {
+                favicon32.href = theme === 'dark' 
+                    ? '/assets/images/new/favicon-dark-32x32.png' 
+                    : '/assets/images/new/favicon-32x32.png';
+            }
         }
 
         function updateThemeIcon() {
@@ -434,7 +460,9 @@
 
         // Initialize theme on page load
         document.addEventListener('DOMContentLoaded', () => {
-            setTheme(getTheme());
+            const theme = getTheme();
+            setTheme(theme);
+            updateLogo(theme);
         });
 
         // Language dropdown functionality
